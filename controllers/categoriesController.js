@@ -12,17 +12,15 @@ async function getCategories(req, res) {
     }
 }
 
-async function postCategorie(req, res) {
+async function insertNewCategorie(req, res) {
     try {
-        console.log("teste");
-        const result = await connection.query(`select * from categories`);
-        console.log(result.rows);
-        res.send(result.rows);
+        await connection.query(`INSERT INTO categories (name) VALUES ($1)`, [req.body.name]);
+        res.sendStatus(201);
 
     } catch (error) {
         console.log(error);
-        res.sendStatus(422);
+        res.sendStatus(500);
     }
 }
 
-export { getCategories, postCategorie };
+export { getCategories, insertNewCategorie };
