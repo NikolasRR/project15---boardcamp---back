@@ -78,11 +78,25 @@ async function newRental(req, res) {
 }
 
 async function returnRental(req, res) {
-    const { name, phone, cpf, birthday } = req.body;
+    const { id } = rez.params;
+    const returnDate = dayjs().format("YYYY-MM-DD");
 
     try {
-        await connection.query(`INSERT INTO customers (name, phone, cpf, birthday) 
-            VALUES ($1, $2, $3, $4)`, [name, phone, cpf, birthday]);
+        const result = await connection.query(
+            `SELECT rentals.*, games."pricePerDay" 
+            FROM rentals 
+            JOIN games ON rentals."gameId" = games.id
+            WHERE "gameId" = $1`, [id]
+        );
+        const dayOfRent = parseInt(result.rows[0].rentDate.split("-")[2]);
+        const dayOfReturn = parseInt(returnDate.split("-")[2]);
+
+        const delayFee = result.rows[0].pricePerDay * (dayOfReturn - dayOfRent);
+
+        await connection.query(
+            `UPDATE rentals 
+            SET "returnDate" = $1, "delayFee" = $2
+            WHERE "gameId" = $3`, [returnDate, delayFee, id]);
         res.sendStatus(201);
 
     } catch (error) {
