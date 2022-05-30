@@ -1,7 +1,7 @@
 import joi from "joi";
 import connection from "../database.js";
 
-async function newCustomerDataValidation (req, res, next) {
+async function customerDataValidation(req, res, next) {
     const dataSchema = joi.object({
         name: joi.string().required(),
         phone: joi.string().pattern(/^[0-9]{10,11}$/).required(),
@@ -15,10 +15,13 @@ async function newCustomerDataValidation (req, res, next) {
     }
 
     try {
-        const result = await connection.query(`SELECT * FROM customers WHERE cpf = $1`, [req.body.cpf]);
-        if (result.rows[0]) {
-            return res.sendStatus(409);
+        if (req.method === "POST") {
+            const result = await connection.query(`SELECT * FROM customers WHERE cpf = $1`, [req.body.cpf]);
+            if (result.rows[0]) {
+                return res.sendStatus(409);
+            }
         }
+
 
         next();
     } catch (error) {
@@ -27,4 +30,4 @@ async function newCustomerDataValidation (req, res, next) {
     }
 }
 
-export default newCustomerDataValidation;
+export default customerDataValidation;

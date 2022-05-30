@@ -8,9 +8,12 @@ async function getCustomers (req, res) {
             const result = await connection.query(
                 `SELECT * FROM customers WHERE cpf LIKE ($1 || '%')`,
             [searchValue]);
+            result.rows.forEach(customer => customer.birthday = customer.birthday.toLocaleDateString().split("/").reverse().join("-"));
             return res.send(result.rows);
         }
+
         const result = await connection.query(`SELECT * FROM customers`);
+        result.rows.forEach(customer => customer.birthday = customer.birthday.toLocaleDateString().split("/").reverse().join("-"));
         res.send(result.rows);
 
     } catch (error) {
@@ -25,6 +28,7 @@ async function getOneCustomer (req, res) {
     try {
         const result = await connection.query(`SELECT * FROM customers WHERE id = $1`, [id]);
         if (result.rows[0]) {
+            result.rows[0].birthday = result.rows[0].birthday.toLocaleDateString().split("/").reverse().join("-");
             return res.send(result.rows[0]);
         }
 
@@ -50,9 +54,15 @@ async function insertNewCustomer (req, res) {
 }
 
 async function updateCustomer (req, res) {
+    const {name, phone, cpf, birthday} = req.body;
+
     try {
-        await connection.query(`INSERT INTO categories (name) VALUES ($1)`, [req.body.name]);
-        res.sendStatus(201);
+        await connection.query(
+            `UPDATE customers SET name = $1, phone = $2, cpf = $3, birthday = $4 
+            WHERE id = $5`,
+            [name, phone, cpf, birthday, req.params.id]
+        );
+        res.sendStatus(200);
 
     } catch (error) {
         console.log(error);
