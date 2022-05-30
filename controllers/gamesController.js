@@ -18,7 +18,9 @@ async function getGames(req, res) {
             return res.send(result.rows);
         }
 
-        const result = await connection.query(`SELECT * FROM games`);
+        const result = await connection.query(
+            `SELECT games.*, categories.name AS "categoryName" FROM games 
+            JOIN categories ON games."categoryId" = categories.id`);
         return res.send(result.rows);
 
     } catch (error) {
