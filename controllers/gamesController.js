@@ -10,7 +10,11 @@ async function getGames(req, res) {
             let searchValueList = array.map(str => str[0].toUpperCase() + str.substring(1).toLowerCase());
             searchValue = searchValueList.join(" ");
 
-            const result = await connection.query(`SELECT * FROM games WHERE name LIKE ($1 || '%')`, [searchValue]);
+            const result = await connection.query(
+                `SELECT games.*, categories.name AS "categoryName" FROM games 
+                JOIN categories ON games."categoryId" = categories.id 
+                WHERE games.name LIKE ($1 || '%')`, 
+            [searchValue]);
             return res.send(result.rows);
         }
 
