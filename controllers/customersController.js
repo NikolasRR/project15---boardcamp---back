@@ -20,10 +20,15 @@ async function getCustomers (req, res) {
 }
 
 async function getOneCustomer (req, res) {
-    try {
-        await connection.query(`INSERT INTO categories (name) VALUES ($1)`, [req.body.name]);
-        res.sendStatus(201);
+    const { id } = req.params;
 
+    try {
+        const result = await connection.query(`SELECT * FROM customers WHERE id = $1`, [id]);
+        if (result.rows[0]) {
+            return res.send(result.rows[0]);
+        }
+
+        res.sendStatus(404);
     } catch (error) {
         console.log(error);
         res.sendStatus(500);
