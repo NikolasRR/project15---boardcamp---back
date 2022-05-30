@@ -1,4 +1,5 @@
 import connection from "./../database.js";
+import dayjs from "dayjs";
 
 async function getCustomers (req, res) {
     const searchValue = req.query.cpf;
@@ -8,12 +9,12 @@ async function getCustomers (req, res) {
             const result = await connection.query(
                 `SELECT * FROM customers WHERE cpf LIKE ($1 || '%')`,
             [searchValue]);
-            result.rows.forEach(customer => customer.birthday = customer.birthday.toLocaleDateString().split("/").reverse().join("-"));
+            result.rows.forEach(customer => customer.birthday = dayjs(customer.birthday).format("YYYY-MM-DD"));
             return res.send(result.rows);
         }
 
         const result = await connection.query(`SELECT * FROM customers`);
-        result.rows.forEach(customer => customer.birthday = customer.birthday.toLocaleDateString().split("/").reverse().join("-"));
+        result.rows.forEach(customer => customer.birthday = dayjs(customer.birthday).format("YYYY-MM-DD"));
         res.send(result.rows);
 
     } catch (error) {

@@ -78,7 +78,7 @@ async function newRental(req, res) {
 }
 
 async function returnRental(req, res) {
-    const { id } = rez.params;
+    const { id } = req.params;
     const returnDate = dayjs().format("YYYY-MM-DD");
 
     try {
@@ -86,9 +86,10 @@ async function returnRental(req, res) {
             `SELECT rentals.*, games."pricePerDay" 
             FROM rentals 
             JOIN games ON rentals."gameId" = games.id
-            WHERE "gameId" = $1`, [id]
+            WHERE rentals.id = $1`, [id]
         );
-        const dayOfRent = parseInt(result.rows[0].rentDate.split("-")[2]);
+        
+        const dayOfRent = parseInt(dayjs(result.rows[0].rentDate).format("YYYY-MM-DD").split("-")[2]);
         const dayOfReturn = parseInt(returnDate.split("-")[2]);
 
         const delayFee = result.rows[0].pricePerDay * (dayOfReturn - dayOfRent);
@@ -96,8 +97,8 @@ async function returnRental(req, res) {
         await connection.query(
             `UPDATE rentals 
             SET "returnDate" = $1, "delayFee" = $2
-            WHERE "gameId" = $3`, [returnDate, delayFee, id]);
-        res.sendStatus(201);
+            WHERE rentals.id = $3`, [returnDate, delayFee, id]);
+        res.sendStatus(200);
 
     } catch (error) {
         console.log(error);
@@ -109,7 +110,7 @@ async function deleteRental(req, res) {
     const { id } = req.params;
 
     try {
-        await connection.query(`DELETE rentals WHERE id = $1`,[id]);
+        await connection.query(`DELETE FROM rentals WHERE id = $1`,[id]);
         res.sendStatus(200);
 
     } catch (error) {
