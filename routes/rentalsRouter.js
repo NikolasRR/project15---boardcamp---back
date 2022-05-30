@@ -9,6 +9,6 @@ const rentalsRoute = express.Router();
 rentalsRoute.get("/rentals", getRentals);
 rentalsRoute.post("/rentals", rentalDataValidation, newRental);
 rentalsRoute.post("/rentals/:id/return", returnDataValidation, returnRental);
-rentalsRoute.delete("/rentals", deleteRental);
+rentalsRoute.delete("/rentals/:id", returnDataValidation, deleteRental);
 
 export default rentalsRoute;

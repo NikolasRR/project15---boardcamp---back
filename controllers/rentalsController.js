@@ -106,14 +106,10 @@ async function returnRental(req, res) {
 }
 
 async function deleteRental(req, res) {
-    const { name, phone, cpf, birthday } = req.body;
+    const { id } = req.params;
 
     try {
-        await connection.query(
-            `UPDATE customers SET name = $1, phone = $2, cpf = $3, birthday = $4 
-            WHERE id = $5`,
-            [name, phone, cpf, birthday, req.params.id]
-        );
+        await connection.query(`DELETE rentals WHERE id = $1`,[id]);
         res.sendStatus(200);
 
     } catch (error) {
