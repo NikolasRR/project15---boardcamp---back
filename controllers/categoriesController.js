@@ -1,6 +1,6 @@
 import connection from "./../database.js";
 
-async function getCategories(req, res) {
+async function getCategories (req, res) {
     try {
         const result = await connection.query(`select * from categories`);
 
@@ -12,7 +12,7 @@ async function getCategories(req, res) {
     }
 }
 
-async function insertNewCategorie(req, res) {
+async function insertNewCategorie (req, res) {
     try {
         await connection.query(`INSERT INTO categories (name) VALUES ($1)`, [req.body.name]);
         res.sendStatus(201);
